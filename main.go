@@ -6,9 +6,13 @@
 package main
 
 import (
-	"log"		// Import the log package for logging
-	"net/http"	// Import the net/http package for HTTP server functionality
+	"fmt"
+	"log"
+	"net/http"
 )
+
+// port is the TCP port number the HTTP server listens on.
+var port = 8081
 
 //  main
 /*
@@ -16,13 +20,19 @@ import (
 	create the endpoint "/", start the port 8081 and serve the files.
 */
 func main() {
+	// Create a file server handler to serve files from the "public" directory.
 	fs := http.FileServer(http.Dir("./public"))
 
+	// Register the file server handler to handle requests to the root URL path.
 	http.Handle("/", fs)
-	log.Println("Starting server on :8081")
 
-	err := http.ListenAndServe(":8081", nil)
+	// Log that the server is starting.
+	log.Printf("Starting server on :%d\n", port)
 
+	// Start the HTTP server on the specified port.
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+
+	// If the server fails to start, log the error and exit.
 	if err != nil {
 		log.Fatal(err)
 	}
