@@ -1,10 +1,29 @@
+// app.js
+/**
+* This script manages the expense tracker functionality, including adding expenses,
+* updating totals, saving data to localStorage, and generating a PDF summary.
+* Ensure the script runs after the DOM is fully loaded
+*/
+
 const incomeInput = document.getElementById("income");
 const expensesDiv = document.getElementById("expenses");
 const summaryDiv = document.getElementById("summary");
 const addExpenseBtn = document.getElementById("add-expense");
 
+/**
+ * An array to store expense objects.
+ * Each expense object may contain details such as amount, category, date, and description.
+ * @type {Array<Object>}
+ */
 let expenses = [];
 
+/**
+ * Creates and appends a new expense item input row to the expenses section.
+ * Automatically hooks into data update logic.
+ *
+ * @param {string} [name=""] - The initial value for the expense name input.
+ * @param {string|number} [amount=""] - The initial value for the expense amount input.
+ */
 function addExpenseItem(name = "", amount = "") {
   const div = document.createElement("div");
   div.className = "expense-item";
@@ -28,6 +47,13 @@ function addExpenseItem(name = "", amount = "") {
   updateData();
 }
 
+/**
+ * Updates the expense tracker data by reading the current income and expense items from the DOM,
+ * recalculates totals, updates the summary display, and saves the data.
+ * 
+ * @function
+ * @returns {void}
+ */
 function updateData() {
   const income = parseFloat(incomeInput.value) || 0;
   const items = expensesDiv.querySelectorAll(".expense-item");
@@ -52,10 +78,20 @@ function updateData() {
   saveData(income, expenses);
 }
 
+/**
+ * Saves the current income and expense list to localStorage.
+ *
+ * @param {number} income - The total income to be saved.
+ * @param {Array<Object>} expenses - An array of expense objects to be saved.
+ */
 function saveData(income, expenses) {
   localStorage.setItem("expenseTrackerData", JSON.stringify({ income, expenses }));
 }
 
+/**
+ * Loads any existing data from localStorage and populates the UI.
+ * Should be called once on page load.
+ */
 function loadData() {
   const data = JSON.parse(localStorage.getItem("expenseTrackerData"));
   if (!data) return;
@@ -64,14 +100,17 @@ function loadData() {
   data.expenses.forEach(e => addExpenseItem(e.name, e.amount));
 }
 
+// Update calculations when income changes
 incomeInput.addEventListener("input", updateData);
+
+// Add new expense input row on button click
 addExpenseBtn.addEventListener("click", () => addExpenseItem());
 
 
 loadData();
 updateData();
 
-
+// Generate PDF summary of current income and expenses
 document.getElementById("download-pdf").addEventListener("click", () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
